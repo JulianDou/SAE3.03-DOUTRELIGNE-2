@@ -20,3 +20,23 @@ var circle = L.circle([51.508, -0.11], {
 }).addTo(map);
 
 */
+
+let mapFunctions = {}
+
+mapFunctions.renderLycee = function(lycee){
+    let latitude = parseFloat(lycee.latitude);
+    let longitude = parseFloat(lycee.longitude);
+    if (isNaN(latitude) || isNaN(longitude)){
+        return;
+    }
+    let marker = L.marker([latitude, longitude]).addTo(map);
+    marker.bindPopup(`<b>${lycee.nom}</b><br>${lycee.adresse}`);
+}
+
+mapFunctions.renderLycees = function(data){
+    for (let lycee of data){
+        mapFunctions.renderLycee(lycee);
+    }
+}
+
+export { mapFunctions };
