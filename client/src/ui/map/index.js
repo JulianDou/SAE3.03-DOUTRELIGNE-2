@@ -107,22 +107,37 @@ mapFunctions.renderCandidatures = function(data){
             }
         }
     }
+
+    console.log(mapFunctions.regions);
     
     for (let region of mapFunctions.regions){
-        let region_marker = L.markerClusterGroup();
+        let region_marker = L.markerClusterGroup({
+            zoomToBoundsOnClick: false,
+            spiderfyOnMaxZoom: false,
+            disableClusteringAtZoom: 12
+        });
 
         for (let departement of region.departements){
-            let departement_marker = L.markerClusterGroup();
+            let departement_marker = L.markerClusterGroup({
+                zoomToBoundsOnClick: false,
+                spiderfyOnMaxZoom: false,
+            });
 
             for (let commune of departement.communes){
-                let commune_marker = L.markerClusterGroup();
+                let commune_marker = L.markerClusterGroup({
+                    zoomToBoundsOnClick: false,
+                    spiderfyOnMaxZoom: false,
+                });
 
+                let commune_total = 0;
                 for (let lycee of commune.lycees){
                     let marker = mapFunctions.renderLycee(lycee);
                     if (marker){
                         commune_marker.addLayer(marker);
+                        commune_total += lycee.candidats.length;
                     }
                 }
+                commune_marker.bindPopup(`<b>${commune_total} candidature(s)`);
 
                 departement_marker.addLayer(commune_marker);
             }
