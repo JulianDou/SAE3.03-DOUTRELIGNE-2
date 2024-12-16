@@ -39,4 +39,26 @@ mapFunctions.renderLycees = function(data){
     }
 }
 
+mapFunctions.renderCandidatures = function(candidatures, lycees){
+    let listeLycees = [];
+    for (let cand of candidatures) {
+        let scolarite = cand.Scolarite;
+        let UAILyceeCandidat = null;
+        for (let annee of scolarite) {
+            UAILyceeCandidat = annee.UAIEtablissementorigine;
+            if (UAILyceeCandidat) {
+                break;
+            }
+        }
+
+        let lyceeFound = lycees.find(lycee => lycee.numero_uai === UAILyceeCandidat);
+        if (lyceeFound) {
+            if (!listeLycees.includes(lyceeFound)){
+                listeLycees.push(lyceeFound);
+                mapFunctions.renderLycee(lyceeFound);
+            }
+        }
+    }
+}
+
 export { mapFunctions };
