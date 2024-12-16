@@ -1,5 +1,8 @@
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
+import 'leaflet.markercluster/dist/MarkerCluster.css';
+import 'leaflet.markercluster/dist/MarkerCluster.Default.css';
+import 'leaflet.markercluster/dist/leaflet.markercluster.js';
 
 var map = L.map('map').setView([45.836, 1.231], 13);
 
@@ -21,6 +24,8 @@ var circle = L.circle([51.508, -0.11], {
 
 let mapFunctions = {}
 
+mapFunctions.regions = [];
+
 mapFunctions.renderLycee = function(lycee){
     // Vérification des coordonnées
     let latitude = parseFloat(lycee.latitude);
@@ -35,8 +40,9 @@ mapFunctions.renderLycee = function(lycee){
         lycee.name = lycee.appellation_officielle;
     }
 
-    let marker = L.marker([latitude, longitude]).addTo(map);
+    let marker = L.marker([latitude, longitude]);
     marker.bindPopup(`<b>${lycee.name}</b><br>${lycee.candidats.length} candidature(s)`);
+    return marker;
 }
 
 mapFunctions.renderLycees = function(data){
@@ -48,8 +54,83 @@ mapFunctions.renderLycees = function(data){
 mapFunctions.renderCandidatures = function(data){
     for (let lycee of data){
         if (lycee.candidats){
-            mapFunctions.renderLycee(lycee);
+
+            // Si la région est déjà enregistrée
+            let region = mapFunctions.regions.find(region => region.code === lycee.code_region);
+            if (region){
+                
+                // Si le département est déjà enregistré
+                let departement = region.departements.find(departement => departement.code === lycee.code_departement);
+                if (departement){
+
+                    // Si la commune est déjà enregistrée
+                    let commune = departement.communes.find(commune => commune.code === lycee.code_commune);
+                    if (commune){
+                        commune.lycees.push(lycee);
+                    }
+
+                    // On enregistre la commune
+                    else {
+                        departement.communes.push({
+                            code: lycee.code_commune,
+                            lycees: [lycee]
+                        });
+                    }
+
+                }
+
+                // On enregistre le département et la commune
+                else {
+                    region.departements.push({
+                        code: lycee.code_departement,
+                        communes: [{
+                            code: lycee.code_commune,
+                            lycees: [lycee]
+                        }]
+                    });
+                }
+
+            }
+
+            // On enregistre la région, le département et la commune
+            else {
+                mapFunctions.regions.push({
+                    code: lycee.code_region,
+                    departements: [{
+                        code: lycee.code_departement,
+                        communes: [{
+                            code: lycee.code_commune,
+                            lycees: [lycee]
+                        }]
+                    }]
+                });
+            }
         }
+    }
+    
+    for (let region of mapFunctions.regions){
+        let region_marker = L.markerClusterGroup();
+
+        for (let departement of region.departements){
+            let departement_marker = L.markerClusterGroup();
+
+            for (let commune of departement.communes){
+                let commune_marker = L.markerClusterGroup();
+
+                for (let lycee of commune.lycees){
+                    let marker = mapFunctions.renderLycee(lycee);
+                    if (marker){
+                        commune_marker.addLayer(marker);
+                    }
+                }
+
+                departement_marker.addLayer(commune_marker);
+            }
+
+            region_marker.addLayer(departement_marker);
+        }
+
+        map.addLayer(region_marker);
     }
 }
 
