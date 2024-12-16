@@ -24,7 +24,7 @@ let V = {
 
 V.init = function(candidats, lycees){
     V.renderHeader();
-    mapFunctions.renderLycees(lycees);
+    mapFunctions.renderCandidatures(candidats, lycees);
 }
 
 V.renderHeader= function(){
