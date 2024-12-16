@@ -8,8 +8,6 @@ L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
 }).addTo(map);
 
-var marker = L.marker([45.83628, 1.23166]).addTo(map);
-
 /* Ajout d'un cercle
 
 var circle = L.circle([51.508, -0.11], {
@@ -24,13 +22,21 @@ var circle = L.circle([51.508, -0.11], {
 let mapFunctions = {}
 
 mapFunctions.renderLycee = function(lycee){
+    // Vérification des coordonnées
     let latitude = parseFloat(lycee.latitude);
     let longitude = parseFloat(lycee.longitude);
     if (isNaN(latitude) || isNaN(longitude)){
         return;
     }
+
+    // Vérification du nom
+    // (Pour accorder les fonctions entre elles)
+    if (!lycee.name){
+        lycee.name = lycee.appellation_officielle;
+    }
+
     let marker = L.marker([latitude, longitude]).addTo(map);
-    marker.bindPopup(`<b>${lycee.nom}</b><br>${lycee.adresse}`);
+    marker.bindPopup(`<b>${lycee.name}</b><br>${lycee.candidats.length} candidature(s)`);
 }
 
 mapFunctions.renderLycees = function(data){
@@ -39,24 +45,10 @@ mapFunctions.renderLycees = function(data){
     }
 }
 
-mapFunctions.renderCandidatures = function(candidatures, lycees){
-    let listeLycees = [];
-    for (let cand of candidatures) {
-        let scolarite = cand.Scolarite;
-        let UAILyceeCandidat = null;
-        for (let annee of scolarite) {
-            UAILyceeCandidat = annee.UAIEtablissementorigine;
-            if (UAILyceeCandidat) {
-                break;
-            }
-        }
-
-        let lyceeFound = lycees.find(lycee => lycee.numero_uai === UAILyceeCandidat);
-        if (lyceeFound) {
-            if (!listeLycees.includes(lyceeFound)){
-                listeLycees.push(lyceeFound);
-                mapFunctions.renderLycee(lyceeFound);
-            }
+mapFunctions.renderCandidatures = function(data){
+    for (let lycee of data){
+        if (lycee.candidats){
+            mapFunctions.renderLycee(lycee);
         }
     }
 }
