@@ -5,21 +5,26 @@ import { Lycees } from "./data/data-lycees.js";
 import './index.css';
 
 import './ui/map/index.js';
+import { mapFunctions } from './ui/map/index.js';
 
 let C = {};
 
 C.init = async function(){
-    V.init();
-    console.log(Candidats.getAll());
-    console.log(Lycees.getAll());
+    let dataCandidats = await Candidats.getAll();
+    let dataLycees = await Lycees.getAll();
+    console.log(dataCandidats);
+    console.log(dataLycees);
+
+    V.init(Candidats.getAll(), Lycees.getAll());
 }
 
 let V = {
     header: document.querySelector("#header")
 };
 
-V.init = function(){
+V.init = function(candidats, lycees){
     V.renderHeader();
+    mapFunctions.renderLycees(lycees);
 }
 
 V.renderHeader= function(){
