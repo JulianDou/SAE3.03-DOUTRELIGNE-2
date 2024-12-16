@@ -4,6 +4,9 @@
 
 ### Codes Diplomes
 
+1. Baccalauréat obtenu
+2. Diplôme étranger équivalent au bac obtenu
+3. ~~(Inexistant)~~
 4. Baccalauréat en préparation
 
 ### Scolarité
@@ -11,7 +14,7 @@
 La liste des années se fait de la plus récente à la plus ancienne.
 Le "cas général" aura seulement les 3 premières de "remplies", mais il est possible d'en avoir plus.
 
-Exemple:
+*Exemple:*
 ```json
 [
     {AnneeScolaireCode: 0, AnneeScolaireLibelle: '2023-2024', UAIEtablissementorigine: '0240035H', NomEtablissementOrigine: 'Lycée Pre De Cordy', CommuneEtablissementOrigineLibelle: 'Sarlat-la-Canéda', …},
@@ -27,7 +30,7 @@ Exemple:
 
 Le lien entre candidats et lycées se fait grâce au numéro UAI.
 
-Exemple :
+*Exemple :*
 ```json
 {
     NomEtablissementOrigine: "Lycée Pre De Cordy",
