@@ -15,7 +15,7 @@ C.init = async function(){
     console.log(dataCandidats);
     console.log(dataLycees);
 
-    V.init(Candidats.getAll(), Lycees.getAll());
+    V.init(dataCandidats, dataLycees);
 }
 
 let V = {
@@ -24,7 +24,7 @@ let V = {
 
 V.init = function(candidats, lycees){
     V.renderHeader();
-    mapFunctions.renderCandidatures(candidats, lycees);
+    mapFunctions.renderCandidatures(lycees);
 }
 
 V.renderHeader= function(){
