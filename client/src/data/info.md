@@ -1,5 +1,9 @@
 # Infos Data
 
+## Lycées
+
+Les lycées sont triés par leur UAI.
+
 ## Candidats
 
 ### Codes Diplomes
@@ -37,3 +41,5 @@ Le lien entre candidats et lycées se fait grâce au numéro UAI.
     UAIEtablissementOrigine: "0240035H"
 }
 ```
+
+On ajoute par-nous mêmes à chaque lycée une liste de leurs candidats pour MMI.

@@ -34,14 +34,8 @@ mapFunctions.renderLycee = function(lycee){
         return;
     }
 
-    // Vérification du nom
-    // (Pour accorder les fonctions entre elles)
-    if (!lycee.name){
-        lycee.name = lycee.appellation_officielle;
-    }
-
     let marker = L.marker([latitude, longitude]);
-    marker.bindPopup(`<b>${lycee.name}</b><br>${lycee.candidats.length} candidature(s)`);
+    marker.bindPopup(`<b>${lycee.appellation_officielle}</b><br>${lycee.candidats.length} candidature(s)`);
     return marker;
 }
 
@@ -52,101 +46,34 @@ mapFunctions.renderLycees = function(data){
 }
 
 mapFunctions.renderCandidatures = function(data){
+    let cluster = L.markerClusterGroup({
+        zoomToBoundsOnClick: false,
+        spiderfyOnMaxZoom: false,
+        disableClusteringAtZoom: 12
+    });
+
     for (let lycee of data){
         if (lycee.candidats){
-
-            // Si la région est déjà enregistrée
-            let region = mapFunctions.regions.find(region => region.code === lycee.code_region);
-            if (region){
-                
-                // Si le département est déjà enregistré
-                let departement = region.departements.find(departement => departement.code === lycee.code_departement);
-                if (departement){
-
-                    // Si la commune est déjà enregistrée
-                    let commune = departement.communes.find(commune => commune.code === lycee.code_commune);
-                    if (commune){
-                        commune.lycees.push(lycee);
-                    }
-
-                    // On enregistre la commune
-                    else {
-                        departement.communes.push({
-                            code: lycee.code_commune,
-                            lycees: [lycee]
-                        });
-                    }
-
-                }
-
-                // On enregistre le département et la commune
-                else {
-                    region.departements.push({
-                        code: lycee.code_departement,
-                        communes: [{
-                            code: lycee.code_commune,
-                            lycees: [lycee]
-                        }]
-                    });
-                }
-
-            }
-
-            // On enregistre la région, le département et la commune
-            else {
-                mapFunctions.regions.push({
-                    code: lycee.code_region,
-                    departements: [{
-                        code: lycee.code_departement,
-                        communes: [{
-                            code: lycee.code_commune,
-                            lycees: [lycee]
-                        }]
-                    }]
-                });
+            let marker = mapFunctions.renderLycee(lycee);
+            if (marker){
+                cluster.addLayer(marker);
             }
         }
     }
 
-    console.log(mapFunctions.regions);
-    
-    for (let region of mapFunctions.regions){
-        let region_marker = L.markerClusterGroup({
-            zoomToBoundsOnClick: false,
-            spiderfyOnMaxZoom: false,
-            disableClusteringAtZoom: 12
-        });
-
-        for (let departement of region.departements){
-            let departement_marker = L.markerClusterGroup({
-                zoomToBoundsOnClick: false,
-                spiderfyOnMaxZoom: false,
-            });
-
-            for (let commune of departement.communes){
-                let commune_marker = L.markerClusterGroup({
-                    zoomToBoundsOnClick: false,
-                    spiderfyOnMaxZoom: false,
-                });
-
-                let commune_total = 0;
-                for (let lycee of commune.lycees){
-                    let marker = mapFunctions.renderLycee(lycee);
-                    if (marker){
-                        commune_marker.addLayer(marker);
-                        commune_total += lycee.candidats.length;
-                    }
-                }
-                commune_marker.bindPopup(`<b>${commune_total} candidature(s)`);
-
-                departement_marker.addLayer(commune_marker);
-            }
-
-            region_marker.addLayer(departement_marker);
+    cluster.on('clusterclick', function (a) {
+        let nbcandidats = 0;
+        let markers = a.layer.getAllChildMarkers();
+        for (let marker of markers){
+            let popup = marker.getPopup().getContent();
+            popup = popup.split('<br>')[1];
+            popup = popup.split(' ')[0];
+            nbcandidats += parseInt(popup);
         }
+        L.popup().setLatLng(a.latlng).setContent(`Nombre de candidats : ${nbcandidats}`).openOn(map);
+    });
 
-        map.addLayer(region_marker);
-    }
+    map.addLayer(cluster);
 }
 
 export { mapFunctions };
