@@ -1,5 +1,8 @@
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
+import 'leaflet.markercluster/dist/MarkerCluster.css';
+import 'leaflet.markercluster/dist/MarkerCluster.Default.css';
+import 'leaflet.markercluster/dist/leaflet.markercluster.js';
 
 var map = L.map('map').setView([45.836, 1.231], 13);
 
@@ -21,6 +24,8 @@ var circle = L.circle([51.508, -0.11], {
 
 let mapFunctions = {}
 
+mapFunctions.regions = [];
+
 mapFunctions.renderLycee = function(lycee){
     // Vérification des coordonnées
     let latitude = parseFloat(lycee.latitude);
@@ -29,14 +34,9 @@ mapFunctions.renderLycee = function(lycee){
         return;
     }
 
-    // Vérification du nom
-    // (Pour accorder les fonctions entre elles)
-    if (!lycee.name){
-        lycee.name = lycee.appellation_officielle;
-    }
-
-    let marker = L.marker([latitude, longitude]).addTo(map);
-    marker.bindPopup(`<b>${lycee.name}</b><br>${lycee.candidats.length} candidature(s)`);
+    let marker = L.marker([latitude, longitude]);
+    marker.bindPopup(`<b>${lycee.appellation_officielle}</b><br>${lycee.candidats.length} candidature(s)`);
+    return marker;
 }
 
 mapFunctions.renderLycees = function(data){
@@ -46,11 +46,34 @@ mapFunctions.renderLycees = function(data){
 }
 
 mapFunctions.renderCandidatures = function(data){
+    let cluster = L.markerClusterGroup({
+        zoomToBoundsOnClick: false,
+        spiderfyOnMaxZoom: false,
+        disableClusteringAtZoom: 12
+    });
+
     for (let lycee of data){
         if (lycee.candidats){
-            mapFunctions.renderLycee(lycee);
+            let marker = mapFunctions.renderLycee(lycee);
+            if (marker){
+                cluster.addLayer(marker);
+            }
         }
     }
+
+    cluster.on('clusterclick', function (a) {
+        let nbcandidats = 0;
+        let markers = a.layer.getAllChildMarkers();
+        for (let marker of markers){
+            let popup = marker.getPopup().getContent();
+            popup = popup.split('<br>')[1];
+            popup = popup.split(' ')[0];
+            nbcandidats += parseInt(popup);
+        }
+        L.popup().setLatLng(a.latlng).setContent(`Nombre de candidats : ${nbcandidats}`).openOn(map);
+    });
+
+    map.addLayer(cluster);
 }
 
 export { mapFunctions };
