@@ -93,4 +93,48 @@ Lycees.getAll = function(){
     return filtered_data;
 }
 
+Lycees.getDepartements = function(){
+    let departements = [];
+
+    for (let lycee of Lycees.getAll()){
+        let codePostal;
+        if (!lycee.code_postal){
+            codePostal = lycee.code_commune.substring(0, 2);
+            codePostal += "000";
+        }
+        else {
+            codePostal = lycee.code_postal;
+        }
+        let departement = departements.find(dep => dep.code_postal === codePostal);
+        if (!departement) {
+            departement = {
+                code_postal: codePostal,
+                candidatsPostBac: 0,
+                candidatsGenerale: 0,
+                candidatsSTI2D: 0,
+                candidatsAutre: 0
+            };
+            departements.push(departement);
+        }
+        for (let candidat of lycee.candidats){
+            if (candidat.Baccalaureat.TypeDiplomeCode == 1){
+                departement.candidatsPostBac++;
+            }
+            else {
+                if (candidat.Baccalaureat.SerieDiplomeCode == "STI2D"){
+                    departement.candidatsSTI2D++;
+                }
+                else if (candidat.Baccalaureat.SerieDiplomeCode == "Générale"){
+                    departement.candidatsGenerale++;
+                }
+                else {
+                    departement.candidatsAutre++;
+                }
+            }
+        }
+    }
+
+    return departements;
+}
+
 export { Lycees };

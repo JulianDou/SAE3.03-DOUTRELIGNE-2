@@ -104,9 +104,11 @@ mapFunctions.formatFilieresLycee = function(lycee){
         let filiereCandidat = candidat.Baccalaureat.SerieDiplomeCode;
         if (!(filiereCandidat == "Générale") && !(filiereCandidat == "STI2D")){
             if (filiereCandidat == "S" || filiereCandidat == "ES" || filiereCandidat == "L"){
-                filiereCandidat = "Générale";
+                filiereCandidat = "Générale (Ancien Bac)";
             }
-            filiereCandidat = "Autre";
+            else {
+                filiereCandidat = "Autre";
+            }
         }
         
         let filiereExistante = filieresLycee.find(filiere => filiere.code === filiereCandidat);
