@@ -5,6 +5,7 @@ import 'leaflet.markercluster/dist/MarkerCluster.Default.css';
 import 'leaflet.markercluster/dist/leaflet.markercluster.js';
 
 import { Lycees } from '../../data/data-lycees.js';
+import { Poste } from '../../data/data-poste.js';
 
 var map = L.map('map').setView([45.836, 1.231], 13);
 
@@ -101,6 +102,12 @@ mapFunctions.formatFilieresLycee = function(lycee){
     let filieresLycee = [];
     for (let candidat of lycee.candidats){
         let filiereCandidat = candidat.Baccalaureat.SerieDiplomeCode;
+        if (!(filiereCandidat == "Générale") && !(filiereCandidat == "STI2D")){
+            if (filiereCandidat == "S" || filiereCandidat == "ES" || filiereCandidat == "L"){
+                filiereCandidat = "Générale";
+            }
+            filiereCandidat = "Autre";
+        }
         
         let filiereExistante = filieresLycee.find(filiere => filiere.code === filiereCandidat);
         if (filiereExistante) {
@@ -112,7 +119,7 @@ mapFunctions.formatFilieresLycee = function(lycee){
 
     let filieresString = ' :';
     for (let filiere of filieresLycee){
-        filieresString += `<br>- ${filiere.quantite} candidature(s) en ${filiere.code}`;
+        filieresString += `<br>- ${filiere.code} : ${filiere.quantite} candidature(s)`;
     }
     
     return {
@@ -125,6 +132,9 @@ mapFunctions.formatFilieresCluster = function(UAIS){
     let filieresTableau = [];
     for (let UAI of UAIS){
         let lycee = Lycees.binarySearch(UAI);
+        if (!lycee){
+            lycee = Poste.binarySearch(UAI);
+        }
         let filieresLycee = mapFunctions.formatFilieresLycee(lycee).tableau;
         for (let filiere of filieresLycee){
             let filiereExistante = filieresTableau.find(f => f.code === filiere.code);

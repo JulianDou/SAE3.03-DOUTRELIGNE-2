@@ -1,7 +1,20 @@
 import { Candidats } from "./data-candidats.js";
+import { Poste } from "./data-poste.js";
 
 let data = await fetch("./src/data/json/lycees.json");
 data = await data.json();
+
+data.shift();
+
+let compare = function(a, b){
+    if (a.numero_uai < b.numero_uai){
+        return -1;
+    }
+    if (a.numero_uai > b.numero_uai){
+        return 1;
+    }
+}
+data.sort(compare);
 
 let Lycees = {}
 
@@ -29,32 +42,19 @@ Lycees.binarySearch = function(UAI){
 // concerné. Ceux qui n'ont pas de candidats n'ont pas cette propriété.
 Lycees.getAll = function(){  
     let candidats = Candidats.getAll();
-
-    data.shift();
-
-    let compare = function(a, b){
-        if (a.numero_uai < b.numero_uai){
-            return -1;
-        }
-        if (a.numero_uai > b.numero_uai){
-            return 1;
-        }
-    }
-    data.sort(compare);
+    let villes = [];
 
     for (let cand of candidats){
 
         let UAI;
-        let nbAnneesCesure = 0;
+        let codePostal;
         for (let annee of cand.Scolarite){
             if (annee.UAIEtablissementorigine){
                 UAI = annee.UAIEtablissementorigine;
+                codePostal = annee.CommuneEtablissementOrigineCodePostal;
                 break;
             }
-            nbAnneesCesure++;
         }
-
-        cand.nbAnneesCesure = nbAnneesCesure;
 
         let lycee = Lycees.binarySearch(UAI);
         if (lycee){
@@ -63,9 +63,32 @@ Lycees.getAll = function(){
             }
             lycee.candidats.push(cand);
         }
+        else {
+            if (codePostal){
+                codePostal = codePostal.substring(0, 2);
+                codePostal += "000";
+                let ville = Poste.binarySearch(codePostal);
+                if (ville){
+                    if (!villes.includes(ville)){
+                        ville.appellation_officielle = ville.nom_de_la_commune;
+                        ville.latitude = parseFloat(ville._geopoint.split(",")[0]);
+                        ville.longitude = parseFloat(ville._geopoint.split(",")[1]);
+                        ville.candidats = [cand];
+                        ville.numero_uai = ville.code_postal;
+                        villes.push(ville);
+                    }
+                    else {
+                        ville.candidats.push(cand);
+                    }
+                }
+            }
+        }
+
     }
 
     let filtered_data = data.filter(lycee => lycee.candidats && lycee.candidats.length > 0);
+
+    filtered_data = filtered_data.concat(villes);
 
     return filtered_data;
 }

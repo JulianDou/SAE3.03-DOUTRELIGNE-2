@@ -10,19 +10,17 @@ import { mapFunctions } from './ui/map/index.js';
 let C = {};
 
 C.init = async function(){
-    let dataCandidats = await Candidats.getAll();
     let dataLycees = await Lycees.getAll();
-    console.log(dataCandidats);
     console.log(dataLycees);
 
-    V.init(dataCandidats, dataLycees);
+    V.init(dataLycees);
 }
 
 let V = {
     header: document.querySelector("#header")
 };
 
-V.init = function(candidats, lycees){
+V.init = function(lycees){
     V.renderHeader();
     mapFunctions.renderCandidatures(lycees);
 }
