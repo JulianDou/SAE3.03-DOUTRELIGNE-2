@@ -7,8 +7,19 @@
     <meta name="description" content="La deuxième partie de la SAE3.03.">
 </head>
 <body class="bg-gray-100 h-screen">
-    <section id="header"></section>
-    <div id="map" class="h-full"></div>
+    <div class="grid h-full w-full grid-cols-[2fr,1fr]">
+        <div class="h-full flex flex-col">            
+            <section id="header"></section>
+            <div id="map" class="h-full"></div>
+        </div>
+        <div class="h-full flex flex-col">
+            <div id="barres" class="h-full"></div>
+            <div class="w-full bg-white h-16 flex flex-col gap-2 items-center justify-center">
+                <input type="range" min="0" max="30" value="15" id="slider">
+                <p id="slider-value">15</p>
+            </div>
+        </div>
+    </div>
     <script type="module" src="src/main.js"></script>
 </body>
 </html>

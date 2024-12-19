@@ -93,4 +93,60 @@ Lycees.getAll = function(){
     return filtered_data;
 }
 
+Lycees.getDepartements = function(){
+
+    let departements = [];
+    let dataLycees = Lycees.getAll();
+
+    for (let lycee of dataLycees){
+        let codePostal;
+        if (!lycee.code_postal){
+            codePostal = lycee.code_commune.substring(0, 2);
+        }
+        else {
+            codePostal = lycee.code_postal.substring(0, 2);
+        }
+        let departement = departements.find(dep => dep.code_postal === codePostal);
+        if (!departement) {
+            departement = {
+                code_postal: codePostal,
+                candidatsPostBac: 0,
+                candidatsGenerale: 0,
+                candidatsSTI2D: 0,
+                candidatsAutre: 0
+            };
+            departements.push(departement);
+        }
+        for (let candidat of lycee.candidats){
+            if (candidat.Baccalaureat.TypeDiplomeCode == 1){
+                departement.candidatsPostBac++;
+            }
+            else {
+                if (candidat.Baccalaureat.SerieDiplomeCode == "STI2D"){
+                    departement.candidatsSTI2D++;
+                }
+                else if (candidat.Baccalaureat.SerieDiplomeCode == "Générale"){
+                    departement.candidatsGenerale++;
+                }
+                else {
+                    departement.candidatsAutre++;
+                }
+            }
+        }
+        departement.total = departement.candidatsPostBac + departement.candidatsGenerale + departement.candidatsSTI2D + departement.candidatsAutre;
+    }
+
+    let compare = function(a, b){
+        if (a.total < b.total){
+            return -1;
+        }
+        if (a.total > b.total){
+            return 1;
+        }
+    }
+    departements.sort(compare);
+
+    return departements;
+}
+
 export { Lycees };
