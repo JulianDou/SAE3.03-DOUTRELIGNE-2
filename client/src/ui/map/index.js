@@ -14,18 +14,26 @@ L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
 }).addTo(map);
 
-/* Ajout d'un cercle
 
-var circle = L.circle([51.508, -0.11], {
+let mapFunctions = {}
+
+let circle = L.circle([45.836, 1.231], {
     color: 'red',
     fillColor: '#f03',
     fillOpacity: 0.5,
-    radius: 500
-}).addTo(map);
+    radius: 650*1000
+    }
+);
 
-*/
-
-let mapFunctions = {}
+mapFunctions.filter = function(rayon){
+    circle.remove();
+    circle = L.circle([45.836, 1.231], {
+        color: 'red',
+        fillColor: '#f03',
+        fillOpacity: 0.5,
+        radius: rayon*1000
+    }).addTo(map);
+}
 
 mapFunctions.regions = [];
 
@@ -54,7 +62,16 @@ mapFunctions.renderLycees = function(data){
     }
 }
 
-mapFunctions.renderCandidatures = function(data){
+mapFunctions.clearMap = function(){
+    map.eachLayer(function (layer) {
+        if (!!layer.toGeoJSON){
+            map.removeLayer(layer);
+        }
+    });
+}
+
+mapFunctions.renderCandidatures = function(data){    
+
     let cluster = L.markerClusterGroup({
         zoomToBoundsOnClick: false,
         spiderfyOnMaxZoom: false,

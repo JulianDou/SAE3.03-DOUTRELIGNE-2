@@ -109,6 +109,8 @@ Lycees.getDepartements = function(){
         let departement = departements.find(dep => dep.code_postal === codePostal);
         if (!departement) {
             departement = {
+                latitude: lycee.latitude,
+                longitude: lycee.longitude,
                 code_postal: codePostal,
                 candidatsPostBac: 0,
                 candidatsGenerale: 0,
@@ -147,6 +149,42 @@ Lycees.getDepartements = function(){
     departements.sort(compare);
 
     return departements;
+}
+
+Lycees.filterByDistance = function(data, distance){
+    let new_data = data;
+    for (let elt of data){
+        if (elt.latitude && elt.longitude){
+            if (distanceVolDoiseau(elt.latitude, elt.longitude, 45.836, 1.231) > distance){
+                new_data = new_data.filter(e => e !== elt);
+            }
+        }
+    }
+    return new_data;
+}
+
+// Distance "à vol d'oiseau" entre deux points géographiques
+// lat_a, lon_a : latitude et longitude du premier point
+// lat_b, lon_b : latitude et longitude du second point
+// Retourne la distance en km
+let distanceVolDoiseau = function(lat_a, lon_a, lat_b, lon_b)
+{
+   // Convertion des degrés en radian
+   let a = Math.PI / 180;
+   let lat1 = lat_a * a;
+   let lat2 = lat_b * a;
+   let lon1 = lon_a * a;
+   let lon2 = lon_b * a;
+  
+   let t1 = Math.sin(lat1) * Math.sin(lat2);
+   let t2 = Math.cos(lat1) * Math.cos(lat2);
+   let t3 = Math.cos(lon1 - lon2);
+   let t4 = t2 * t3;
+   let t5 = t1 + t4;
+   let rad_dist = Math.atan(-t5/Math.sqrt(-t5 * t5 +1)) + 2 * Math.atan(1);
+
+
+   return (rad_dist * 3437.74677 * 1.1508) * 1.6093470878864446;
 }
 
 export { Lycees };
