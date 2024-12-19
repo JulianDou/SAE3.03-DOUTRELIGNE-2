@@ -58,12 +58,15 @@ C.handler_toggleCircle = async function(event){
         mapFunctions.filter(value);
 
         let new_lycees = await Lycees.filterByDistance(C.data.lycees, value);
+        let new_departements = await Lycees.filterByDistance(C.data.departements, value);
 
         mapFunctions.renderCandidatures(new_lycees);
+        Barres.render(new_departements, document.querySelector("#slider").value);
     }
     else {
         mapFunctions.clearMap();
         mapFunctions.renderCandidatures(C.data.lycees);
+        Barres.render(C.data.departements, document.querySelector("#slider").value);
     }
 }
 
