@@ -19,40 +19,81 @@ let Barres = {};
 
 */
 
-Barres.render = function(data){
+Barres.render = function(data, seuil){
 
     let finalData = [];
     let labelList = [];
 
+    let tabPostBac = [];
+    let tabGenerale = [];
+    let tabSTI2D = [];
+    let tabAutre = [];
+
+    let exclusPostBac = 0;
+    let exclusGenerale = 0;
+    let exclusSTI2D = 0;
+    let exclusAutre = 0;
+
     for (let elt of data){
-        finalData.push({
-            values: [elt.candidatsPostBac],
-            stack: elt.code_postal
-        });
-        finalData.push({
-            values: [elt.candidatsGenerale],
-            stack: elt.code_postal
-        });
-        finalData.push({
-            values: [elt.candidatsSTI2D],
-            stack: elt.code_postal
-        });
-        finalData.push({
-            values: [elt.candidatsAutre],
-            stack: elt.code_postal
-        });
+        if (elt.total < seuil){
+            exclusPostBac += elt.candidatsPostBac;
+            exclusGenerale += elt.candidatsGenerale;
+            exclusSTI2D += elt.candidatsSTI2D;
+            exclusAutre += elt.candidatsAutre;
+            continue;
+        }
+        tabPostBac.push(elt.candidatsPostBac);
+        tabGenerale.push(elt.candidatsGenerale);
+        tabSTI2D.push(elt.candidatsSTI2D);
+        tabAutre.push(elt.candidatsAutre);
+        
         labelList.push(elt.code_postal);
     }
 
-    console.log(labelList);
+    tabPostBac.push(exclusPostBac);
+    tabGenerale.push(exclusGenerale);
+    tabSTI2D.push(exclusSTI2D);
+    tabAutre.push(exclusAutre);
+    labelList.push("Autres");
 
+    finalData.push({
+        values: tabGenerale,
+        backgroundColor: '#4bd4f9',
+        text: 'Générale',
+        stack: "1"
+    });
+    finalData.push({
+        values: tabSTI2D,
+        backgroundColor: '#61b955',
+        text: 'STI2D',
+        stack: "1"
+    });
+    finalData.push({
+        values: tabPostBac,
+        backgroundColor: '#cc6adc',
+        text: 'Post-Bac',
+        stack: "1"
+    });
+    finalData.push({
+        values: tabAutre,
+        backgroundColor: '#f36243',
+        text: 'Autres',
+        stack: "1"
+    });
+    
     let chartConfig = {
         type: 'hbar',
         plot: {
             stacked: true
         },
+        legend: {
+            minimize: true,
+        },
         scaleX: {
-            labels: labelList
+            labels: labelList,
+            "items-overlap": true,
+            "max-items": 999999,
+            "max-labels": 999999,
         },
         series: finalData,
     }

@@ -94,16 +94,17 @@ Lycees.getAll = function(){
 }
 
 Lycees.getDepartements = function(){
-    let departements = [];
 
-    for (let lycee of Lycees.getAll()){
+    let departements = [];
+    let dataLycees = Lycees.getAll();
+
+    for (let lycee of dataLycees){
         let codePostal;
         if (!lycee.code_postal){
             codePostal = lycee.code_commune.substring(0, 2);
-            codePostal += "000";
         }
         else {
-            codePostal = lycee.code_postal;
+            codePostal = lycee.code_postal.substring(0, 2);
         }
         let departement = departements.find(dep => dep.code_postal === codePostal);
         if (!departement) {
@@ -132,7 +133,18 @@ Lycees.getDepartements = function(){
                 }
             }
         }
+        departement.total = departement.candidatsPostBac + departement.candidatsGenerale + departement.candidatsSTI2D + departement.candidatsAutre;
     }
+
+    let compare = function(a, b){
+        if (a.total < b.total){
+            return -1;
+        }
+        if (a.total > b.total){
+            return 1;
+        }
+    }
+    departements.sort(compare);
 
     return departements;
 }
