@@ -16,7 +16,7 @@ C.data = {};
 C.init = async function(){
     C.data.lycees = await Lycees.getAll();
 
-    C.data.departements = await Lycees.getDepartements();
+    C.data.departements = await Lycees.getDepartements(C.data.lycees);
 
     V.init(C.data.lycees, C.data.departements);
 
@@ -113,8 +113,37 @@ C.filterManager = async function(idFilter, distance){
                 let dataLycees = await Lycees.filterByFiliere("Générale", C.data.lycees);
                 let new_lycees = await Lycees.filterByDistance(dataLycees, distance);
                 mapFunctions.filter(distance);
-                mapFunctions.renderCandidatures(new_lycees);
+                mapFunctions.renderCandidatures(new_lycees, "Générale");
+            }
+            else {
+                let dataLycees = await Lycees.filterByFiliere("Générale", C.data.lycees);
+                mapFunctions.renderCandidatures(dataLycees, "Générale");
+            }
+            break;
 
+        case "sti2d":
+            if (distance){
+                let dataLycees = await Lycees.filterByFiliere("STI2D", C.data.lycees);
+                let new_lycees = await Lycees.filterByDistance(dataLycees, distance);
+                mapFunctions.filter(distance);
+                mapFunctions.renderCandidatures(new_lycees, "STI2D");
+            }
+            else {
+                let dataLycees = await Lycees.filterByFiliere("STI2D", C.data.lycees);
+                mapFunctions.renderCandidatures(dataLycees, "STI2D");
+            }
+            break;
+
+        case "autres":
+            if (distance){
+                let dataLycees = await Lycees.filterByFiliere("Autre", C.data.lycees);
+                let new_lycees = await Lycees.filterByDistance(dataLycees, distance);
+                mapFunctions.filter(distance);
+                mapFunctions.renderCandidatures(new_lycees, "Autre");
+            }
+            else {
+                let dataLycees = await Lycees.filterByFiliere("Autre", C.data.lycees);
+                mapFunctions.renderCandidatures(dataLycees, "Autre");
             }
             break;
 
@@ -128,7 +157,6 @@ let V = {
 V.init = function(lycees, departements){
     V.renderHeader();
     mapFunctions.renderCandidatures(lycees);
-    mapFunctions.filter(650);
     Barres.render(departements, 15);
 }
 

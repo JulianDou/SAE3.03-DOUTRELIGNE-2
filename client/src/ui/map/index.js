@@ -70,7 +70,7 @@ mapFunctions.clearMap = function(){
     });
 }
 
-mapFunctions.renderCandidatures = function(data){    
+mapFunctions.renderCandidatures = function(data, filtre){
 
     let cluster = L.markerClusterGroup({
         zoomToBoundsOnClick: false,
@@ -104,7 +104,7 @@ mapFunctions.renderCandidatures = function(data){
             UAIS.push(popup_UAI);
         }
 
-        let filieresString = mapFunctions.formatFilieresCluster(UAIS).string;
+        let filieresString = mapFunctions.formatFilieresCluster(UAIS, filtre).string;
 
         L.popup().setLatLng(a.latlng).setContent(`
             ${nbcandidats} candidature(s)
@@ -147,7 +147,7 @@ mapFunctions.formatFilieresLycee = function(lycee){
     };
 }
 
-mapFunctions.formatFilieresCluster = function(UAIS){
+mapFunctions.formatFilieresCluster = function(UAIS, filtre){
     let filieresTableau = [];
     for (let UAI of UAIS){
         let lycee = Lycees.binarySearch(UAI);
@@ -167,7 +167,14 @@ mapFunctions.formatFilieresCluster = function(UAIS){
 
     let filieresString = ' :';
     for (let filiere of filieresTableau){
-        filieresString += `<br>- ${filiere.quantite} candidature(s) en ${filiere.code}`;
+        if (filtre){
+            if (filiere.code == filtre){
+                filieresString += `<br>- ${filiere.quantite} candidature(s) en ${filiere.code}`;
+            }
+        }
+        else {
+            filieresString += `<br>- ${filiere.quantite} candidature(s) en ${filiere.code}`;
+        }
     }
 
     return {

@@ -93,12 +93,11 @@ Lycees.getAll = function(){
     return filtered_data;
 }
 
-Lycees.getDepartements = function(){
+Lycees.getDepartements = function(data){
 
-    let departements = [];
-    let dataLycees = Lycees.getAll();
+    let departements = [];;
 
-    for (let lycee of dataLycees){
+    for (let lycee of data){
         let codePostal;
         if (!lycee.code_postal){
             codePostal = lycee.code_commune.substring(0, 2);
@@ -166,11 +165,18 @@ Lycees.filterByDistance = function(data, distance){
 Lycees.filterByFiliere = function(filiere, data){
     let lycees = [];
     for (let lycee of data){
+        let new_candidats = [];
+        let has_filiere = false;
         for (let candidat of lycee.candidats){
             if (candidat.Baccalaureat.SerieDiplomeCode == filiere){
-                lycees.push(lycee);
-                break;
+                new_candidats.push(candidat);
+                has_filiere = true;
             }
+        }
+        let new_lycee = JSON.parse(JSON.stringify(lycee));
+        new_lycee.candidats = new_candidats;
+        if (has_filiere){
+            lycees.push(new_lycee);
         }
     }
     return lycees;
