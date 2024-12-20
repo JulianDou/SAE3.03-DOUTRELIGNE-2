@@ -134,19 +134,6 @@ C.filterManager = async function(idFilter, distance){
             }
             break;
 
-        case "autres":
-            if (distance){
-                let dataLycees = await Lycees.filterByFiliere("Autre", C.data.lycees);
-                let new_lycees = await Lycees.filterByDistance(dataLycees, distance);
-                mapFunctions.filter(distance);
-                mapFunctions.renderCandidatures(new_lycees, "Autre");
-            }
-            else {
-                let dataLycees = await Lycees.filterByFiliere("Autre", C.data.lycees);
-                mapFunctions.renderCandidatures(dataLycees, "Autre");
-            }
-            break;
-
     }
 }
 
