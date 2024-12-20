@@ -39,6 +39,7 @@ C.handler_mapSlider = async function(event){
     let value = event.target.value;
     document.querySelector("#map-slider-value").innerHTML = value + " km";
     mapFunctions.filter(value);
+    document.querySelector("#toggle-circle").checked = true;
 
     let new_departements = await Lycees.filterByDistance(C.data.departements, value);
     let new_lycees = await Lycees.filterByDistance(C.data.lycees, value);
@@ -77,7 +78,6 @@ let V = {
 V.init = function(lycees, departements){
     V.renderHeader();
     mapFunctions.renderCandidatures(lycees);
-    mapFunctions.filter(650);
     Barres.render(departements, 15);
 }
 
