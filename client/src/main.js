@@ -16,7 +16,7 @@ C.data = {};
 C.init = async function(){
     C.data.lycees = await Lycees.getAll();
 
-    C.data.departements = await Lycees.getDepartements();
+    C.data.departements = await Lycees.getDepartements(C.data.lycees);
 
     V.init(C.data.lycees, C.data.departements);
 
