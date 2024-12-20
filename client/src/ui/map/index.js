@@ -63,6 +63,7 @@ mapFunctions.renderLycees = function(data){
 }
 
 mapFunctions.clearMap = function(){
+    console.log("clearMap");
     map.eachLayer(function (layer) {
         if (!!layer.toGeoJSON){
             map.removeLayer(layer);
@@ -70,7 +71,8 @@ mapFunctions.clearMap = function(){
     });
 }
 
-mapFunctions.renderCandidatures = function(data){    
+mapFunctions.renderCandidatures = function(data){   
+    console.log("renderCandidatures"); 
 
     let cluster = L.markerClusterGroup({
         zoomToBoundsOnClick: false,

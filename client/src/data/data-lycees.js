@@ -93,12 +93,11 @@ Lycees.getAll = function(){
     return filtered_data;
 }
 
-Lycees.getDepartements = function(){
+Lycees.getDepartements = function(data){
 
     let departements = [];
-    let dataLycees = Lycees.getAll();
 
-    for (let lycee of dataLycees){
+    for (let lycee of data){
         let codePostal;
         if (!lycee.code_postal){
             codePostal = lycee.code_commune.substring(0, 2);
