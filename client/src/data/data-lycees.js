@@ -163,6 +163,19 @@ Lycees.filterByDistance = function(data, distance){
     return new_data;
 }
 
+Lycees.filterByFiliere = function(filiere, data){
+    let lycees = [];
+    for (let lycee of data){
+        for (let candidat of lycee.candidats){
+            if (candidat.Baccalaureat.SerieDiplomeCode == filiere){
+                lycees.push(lycee);
+                break;
+            }
+        }
+    }
+    return lycees;
+}
+
 // Distance "à vol d'oiseau" entre deux points géographiques
 // lat_a, lon_a : latitude et longitude du premier point
 // lat_b, lon_b : latitude et longitude du second point

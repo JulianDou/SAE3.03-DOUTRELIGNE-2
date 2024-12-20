@@ -23,6 +23,7 @@ C.init = async function(){
     document.querySelector("#slider").addEventListener("change", C.handler_Slider);
     document.querySelector("#map-slider").addEventListener("change", C.handler_mapSlider);
     document.querySelector("#toggle-circle").addEventListener("click", C.handler_toggleCircle);
+    document.querySelector("#radios").addEventListener("click", C.handler_Radios);
 }
 
 C.handler_Slider = async function(event){
@@ -34,39 +35,89 @@ C.handler_Slider = async function(event){
 }
 
 C.handler_mapSlider = async function(event){
-    mapFunctions.clearMap();
+    let distance = event.target.value
+    document.querySelector("#toggle-circle").checked = true;
+    document.querySelector("#map-slider-value").innerHTML = distance + " km";
 
-    let value = event.target.value;
-    document.querySelector("#map-slider-value").innerHTML = value + " km";
-    mapFunctions.filter(value);
-
-    let new_departements = await Lycees.filterByDistance(C.data.departements, value);
-    let new_lycees = await Lycees.filterByDistance(C.data.lycees, value);
-
-    document.querySelector("#barres").innerHTML = "";
-    let barresValue = document.querySelector("#slider").value;
-    Barres.render(new_departements, barresValue);
-    mapFunctions.renderCandidatures(new_lycees);
+    let radios = document.querySelectorAll("input[type=radio]");
+    let idRadio = undefined;
+    for (let radio of radios){
+        if (radio.checked){
+            idRadio = radio.id;
+            idRadio = idRadio.split("-")[1];
+            break;
+        }
+    }
+    C.filterManager(idRadio, distance);
 }
 
 C.handler_toggleCircle = async function(event){
     let checked = event.target.checked;
+    let distance = document.querySelector("#map-slider").value
+    let radios = document.querySelectorAll("input[type=radio]");
+    let idRadio = undefined;
+    for (let radio of radios){
+        if (radio.checked){
+            idRadio = radio.id;
+            idRadio = idRadio.split("-")[1];
+            break;
+        }
+    }
     if (checked){
-        mapFunctions.clearMap();
-
-        let value = document.querySelector("#map-slider").value;
-        mapFunctions.filter(value);
-
-        let new_lycees = await Lycees.filterByDistance(C.data.lycees, value);
-        let new_departements = await Lycees.filterByDistance(C.data.departements, value);
-
-        mapFunctions.renderCandidatures(new_lycees);
-        Barres.render(new_departements, document.querySelector("#slider").value);
+        C.filterManager(idRadio, distance);
     }
     else {
-        mapFunctions.clearMap();
-        mapFunctions.renderCandidatures(C.data.lycees);
-        Barres.render(C.data.departements, document.querySelector("#slider").value);
+        C.filterManager(idRadio, undefined);
+    }
+}
+
+C.handler_Radios = async function(event){
+    if (event.target.type != "radio"){
+        return;
+    }
+    else {
+        let id = event.target.id;
+        id = id.split("-")[1];
+
+        let distance = document.querySelector("#map-slider").value;
+        let checked = document.querySelector("#toggle-circle").checked;
+        if (checked){
+            C.filterManager(id, distance);
+        }
+        else {
+            C.filterManager(id, undefined);
+        }
+    }
+}
+
+C.filterManager = async function(idFilter, distance){
+    let valueBarres = document.querySelector("#slider").value;
+    mapFunctions.clearMap();
+    switch (idFilter) {
+        case "tous":
+            if (distance){
+                let new_departements = await Lycees.filterByDistance(C.data.departements, distance);
+                let new_lycees = await Lycees.filterByDistance(C.data.lycees, distance);
+                mapFunctions.filter(distance);
+                mapFunctions.renderCandidatures(new_lycees);
+                Barres.render(new_departements, valueBarres);
+            }
+            else {
+                mapFunctions.renderCandidatures(C.data.lycees);
+                Barres.render(C.data.departements, valueBarres);
+            }
+            break;
+        
+        case "generale":
+            if (distance){
+                let dataLycees = await Lycees.filterByFiliere("Générale", C.data.lycees);
+                let new_lycees = await Lycees.filterByDistance(dataLycees, distance);
+                mapFunctions.filter(distance);
+                mapFunctions.renderCandidatures(new_lycees);
+
+            }
+            break;
+
     }
 }
 
